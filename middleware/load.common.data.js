@@ -7,18 +7,13 @@ const cache = new NodeCache();
 
 const loadCommonData = async(req,res,next) => {
     try {
-        var settings = cache.get("settingsCache");
-        var latestNews = cache.get("latestNewsCache");
+        var settings = await Settings.findOne().lean();
+        var latestNews = await News.find().sort({createdAt: -1}).limit(5).populate("author","fullname").populate("category",{name: 1, slug: 1}).lean();
         var categories = cache.get("categoriesCache");
 
-        if (!latestNews && !settings && !categories){
-            settings = await Settings.findOne().lean();
-            latestNews = await News.find().sort({createdAt: -1}).limit(5).populate("author","fullname").populate("category",{name: 1, slug: 1}).lean();
+        if (!categories){
             const uniqueCategories = await News.distinct("category");
             categories = await Category.find({_id: {$in: uniqueCategories}}).lean();
-
-            cache.set("settingsCache",settings,60*60);
-            cache.set("latestNewsCache",latestNews,60*60);
             cache.set("categoriesCache",categories,60*60);
         }
         

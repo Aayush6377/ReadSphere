@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ADMIN | Login</title>
+  <title><%= settings.website_title %> | Login</title>
+  <link rel="icon" href="<%= settings.website_logo %>" type="image/jpg">
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet"/>
   <style type="text/tailwindcss">
@@ -77,7 +78,7 @@
     <div class="p-8 sm:p-10">
       <div class="text-center mb-8">
         <!-- Logo Image -->
-        <img src="/images/news.jpg" alt="Admin Logo" class="mx-auto mb-4 h-16 w-auto">
+        <img src="<%= settings.website_logo %>" alt="Admin Logo" class="mx-auto mb-4 h-16 w-auto">
 
         <h2 class="text-3xl font-extrabold text-gray-900">Admin Login</h2>
         <p class="mt-2 text-sm text-[var(--text-secondary)]">Sign in to manage the admin dashboard.</p>

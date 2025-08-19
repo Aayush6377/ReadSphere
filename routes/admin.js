@@ -8,8 +8,11 @@ import checkLogin from "../middleware/isLogin.js";
 import isAdmin from "../middleware/isadmin.js";
 import uploader from "../middleware/multer.js";
 import * as validator from "../middleware/validation.js";
+import loadCommonData from "../middleware/load.common.data.js";
 
 const router = express.Router();
+
+router.use(loadCommonData);
 
 //Login Routes
 router.get("/",authController.loginPage);

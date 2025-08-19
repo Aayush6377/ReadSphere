@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import fs from "fs";
 import path from "path";
 import createError from "../utils/error.message.js";
+import { uploadToCloudinary, deleteImageFromCloudinary } from "../middleware/multer.js";
 
 export const allArticle = async (req,res,next) => {
     try {
@@ -30,10 +31,18 @@ export const addArticlePage = async (req,res) => {
 export const addArticle = async (req,res,next) => {
     try {
         const {title, content, category} = req.body;
+        let imageUrl = "https://www.achievershunt.com/public/uploads/course-banner/placeholder/placeholder.png";
+
+        if (req.file) {
+            imageUrl = await uploadToCloudinary(req.file.buffer, "articles");
+        }
+
         const newArticle = new News({
-            title, content, category,
+            title,
+            content,
+            category,
             author: req.id,
-            image: req.file?.filename || "../images/default_article.png"
+            image: imageUrl
         });
         await newArticle.save();
         res.status(200).redirect("/admin/article");
@@ -41,6 +50,8 @@ export const addArticle = async (req,res,next) => {
         next(createError(error.message));
     }
 }
+
+
 
 export const updateArticlePage = async (req,res,next) => {
     try {
@@ -69,44 +80,30 @@ export const updateArticlePage = async (req,res,next) => {
 export const updateArticle = async (req,res,next) => {
     try {
         const articleId = req.params.id;
-        if (!mongoose.Types.ObjectId.isValid(articleId)){
-            return next(createError("Invalid Article ID", 400)); 
-        }
-        
         const article = await News.findById(articleId);
-        if (!article){
-            return next(createError("Article Not Found", 404));
-        }
+        if (!article) return next(createError("Article Not Found", 404));
 
-        if (req.role === "author"){
-            if (req.id.toString() !== article.author.toString()){
-                return next(createError("Unauthorized user", 401));
-            }
+        if (req.role === "author" && req.id.toString() !== article.author.toString()) {
+            return next(createError("Unauthorized user", 401));
         }
 
         const {title, content, category} = req.body;
-        let image = article.image;
-        
-        if (req.file){
-            if (image !== "../images/default_article.png"){
-                fs.unlink(path.join("public","uploads",image), (err) => {
-                    if (err){
-                        throw err;
-                    }
-                });
+        let imageUrl = article.image;
+
+        if (req.file) {
+            if (imageUrl && !imageUrl.includes("default_article.png")) {
+                await deleteImageFromCloudinary(imageUrl);
             }
-            image = req.file.filename;
+            imageUrl = await uploadToCloudinary(req.file.buffer, "articles");
         }
         
-        await News.findByIdAndUpdate(articleId,{
-            title, content, category, image
-        }, {new: true});
+        await News.findByIdAndUpdate(articleId, { title, content, category, image: imageUrl }, { new: true });
         res.status(200).redirect("/admin/article");
-
     } catch (error) {
         next(createError(error.message));
     }
 }
+
 
 export const deleteArticle = async (req,res,next) => {
     try {
@@ -125,11 +122,7 @@ export const deleteArticle = async (req,res,next) => {
         const image = article.image;
 
         if (image !== "../images/default_article.png"){
-            fs.unlink(path.join("public","uploads",image),(err)=>{
-                if (err){
-                    throw err;
-                }
-            });
+            deleteImageFromCloudinary(image);
         }
 
         const comments = await Comment.deleteMany({article: articleId});

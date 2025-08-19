@@ -7,10 +7,11 @@ import jwt from "jsonwebtoken";
 import fs from "fs";
 import path from "path";
 import createError from "../utils/error.message.js";
+import { uploadToCloudinary, deleteImageFromCloudinary } from "../middleware/multer.js";
 
-export const loginPage = (req,res) => {
+export const loginPage = async (req,res) => {
     res.status(200).render("admin/login",{
-        layout: false
+        layout: false,
     });
 }
 
@@ -57,22 +58,19 @@ export const settings = async (req,res) => {
 export const saveSettings = async (req,res,next) => {
     try {
         const {website_title, footer_description} = req.body;
-        let website_logo = req.file ? req.file.filename : null;
 
-        if (website_logo){
-            fs.rename(path.join("public","uploads",website_logo), path.join("public","images","news.jpg"),(err) => {
-                if (err){
-                    throw err;
-                }
-            });
+        const settings = await Settings.findOne({});
+
+        if (req.file){
+            const website_logo = await uploadToCloudinary(req.file.buffer, "articles");
+            deleteImageFromCloudinary(settings.website_logo);
+            settings.website_logo = website_logo;
         }
-        website_logo = "/images/news.jpg"
-        const settings = await Settings.findOneAndUpdate({},{
-            website_title,
-            website_logo,
-            footer_description
-        }, {new: true, upsert: true});
         
+        settings.website_title = website_title;
+        settings.footer_description = footer_description;
+
+        await settings.save();
         res.status(200).redirect("/admin/settings");
     } catch (error) {
         next(createError(error.message));
@@ -82,6 +80,7 @@ export const saveSettings = async (req,res,next) => {
 export const dashboard = async (req,res,next) => {
     try {
         let articleCount;
+
         if (req.role === "admin"){
             articleCount = await News.countDocuments();
         }

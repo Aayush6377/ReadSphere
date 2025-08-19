@@ -9,6 +9,7 @@ import frontendRoute from "./routes/frontend.js";
 import adminRoute from "./routes/admin.js";
 import minifyHTML from "express-minify-html-terser";
 import compression from "compression";
+import cloudinary from "cloudinary";
 
 dotenv.config();
 const app = express();
@@ -54,6 +55,12 @@ mongoose.connect(process.env.MONGO_URL)
 app.use("/admin",(req,res,next) => {
     res.locals.layout = "admin/layout";
     next();
+});
+
+cloudinary.v2.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET,
 });
 
 app.use("/admin",adminRoute);
