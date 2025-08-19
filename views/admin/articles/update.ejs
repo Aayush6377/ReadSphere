@@ -1,0 +1,141 @@
+<div id="admin-content" class="p-6 bg-gray-50 min-h-screen">
+  <div class="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-sm">
+    <h1 class="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
+      <span class="material-icons mr-2 text-blue-600">article</span>
+      Update Article
+    </h1>
+
+    <% if (typeof errList === "undefined") errList = {}; %>
+    <% if (typeof old === "undefined") old = {}; %>
+
+    <!-- Form -->
+    <form action="/admin/update-article/<%= article._id %>" method="POST" enctype="multipart/form-data" class="space-y-6">
+      
+      <!-- Title -->
+      <div>
+        <label for="article_title" class="block text-sm font-medium text-gray-700 mb-2">Title</label>
+        <input type="text" 
+               name="title" 
+               id="article_title" 
+               value="<%= old?.title ? old.title : article.title %>" 
+               required
+               class="w-full px-4 py-2 border <%= errList?.title ? 'border-red-500' : 'border-gray-300' %> rounded-lg focus:ring-blue-500 focus:border-blue-500" />
+        <% if (errList?.title) { %>
+          <p class="mt-2 text-sm text-red-600"><%= errList.title %></p>
+        <% } %>
+      </div>
+
+      <!-- Description -->
+      <div>
+        <label for="summernote" class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+        <textarea name="content" 
+                  id="summernote" 
+                  rows="6" 
+                  required
+                  class="w-full border <%= errList?.content ? 'border-red-500' : 'border-gray-300' %> rounded-lg"><%= old?.content ? old.content : article.content %></textarea>
+        <% if (errList?.content) { %>
+          <p class="mt-2 text-sm text-red-600"><%= errList.content %></p>
+        <% } %>
+      </div>
+
+      <!-- Category -->
+      <div>
+        <label for="article_category" class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+        <select name="category" 
+                id="article_category" 
+                required
+                class="w-full px-4 py-2 border <%= errList?.category ? 'border-red-500' : 'border-gray-300' %> rounded-lg focus:ring-blue-500 focus:border-blue-500">
+          <option value="" disabled>Select Category</option>
+          <% categories.forEach((category) => {
+                let checker = old?.category ? old.category : article.category;
+          %>
+            <option value="<%= category._id %>" <%= checker.toString() === category._id.toString() ? 'selected' : '' %>><%= category.name %></option>
+          <% }) %>
+        </select>
+        <% if (errList?.category) { %>
+          <p class="mt-2 text-sm text-red-600"><%= errList.category %></p>
+        <% } %>
+      </div>
+
+      <!-- Image Upload -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Article Image</label>
+        <div id="upload-container"
+             class="mt-2 flex flex-col items-center justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer">
+          <img id="image-preview" src="/uploads/<%= article.image %>" alt="<%= article.title %>" class="mb-3 max-h-40 rounded border border-gray-300"/>
+          <span class="material-icons text-4xl text-gray-400">cloud_upload</span>
+          <p class="text-sm text-gray-600 mt-2">Click to upload or drag and drop</p>
+          <input type="file" 
+                 name="image" 
+                 id="article_image" 
+                 class="mt-3 hidden <%= errList?.image ? 'border-red-500' : '' %>" />
+          <% if (errList?.image) { %>
+            <p class="mt-2 text-sm text-red-600"><%= errList.image %></p>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div class="flex justify-end">
+        <button type="submit" 
+                name="submit" 
+                class="bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          Update Article
+        </button>
+      </div>
+    </form>
+    <!--/Form -->
+  </div>
+</div>
+
+<!-- Summernote -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $('#summernote').summernote({
+      placeholder: 'Start typing...',
+      tabsize: 2,
+      height: 250
+    });
+  });
+
+  // remove unwanted field
+  document.querySelector("form").addEventListener("submit", function (e) {
+    const unwantedField = document.querySelector(`input[name="files"]`);
+    if (unwantedField) unwantedField.remove();
+  });
+
+  // Image preview
+  const input = document.getElementById("article_image");
+  const preview = document.getElementById("image-preview");
+  const container = document.getElementById("upload-container");
+
+  // Click container to trigger file input
+  container.addEventListener("click", () => input.click());
+
+  input.addEventListener("change", () => {
+    const file = input.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        preview.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+</script>
+
+<%- contentFor("summernoteCSS") %>
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.css" rel="stylesheet">
+
+<style>
+.note-editor.fullscreen {
+  background-color: #ffffff !important;
+  z-index: 1050;
+}
+
+body.note-fullscreen {
+  background-color: #ffffff !important;
+}
+</style>

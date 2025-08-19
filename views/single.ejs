@@ -1,0 +1,96 @@
+<div class="max-w-4xl mx-auto px-4 lg:px-0 py-10">
+  
+  <!-- Article -->
+  <article class="bg-white shadow-md rounded-2xl p-8">
+    
+    <!-- Title -->
+    <h1 class="text-3xl font-bold text-gray-900 mb-4">
+      <%= singleNews.title %>
+    </h1>
+
+    <!-- Meta Info -->
+    <div class="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-6">
+      <span class="flex items-center gap-1">
+        <i class="fa fa-tags"></i>
+        <a href="/category/<%= singleNews.category.slug %>" class="hover:text-indigo-600">
+          <%= singleNews.category.name %>
+        </a>
+      </span>
+      <span class="flex items-center gap-1">
+        <i class="fa fa-user"></i>
+        <a href="/author/<%= singleNews.author._id %>" class="hover:text-indigo-600">
+          <%= singleNews.author.fullname %>
+        </a>
+      </span>
+      <span class="flex items-center gap-1">
+        <i class="fa fa-calendar"></i>
+        <%= singleNews.createdAt.toLocaleString("en-IN", { year: "numeric", month: "short", day: "numeric" }) %>
+      </span>
+    </div>
+
+    <!-- Featured Image -->
+    <div class="mb-6">
+      <img 
+        src="/uploads/<%= singleNews.image %>" 
+        alt="<%= singleNews.title %>" 
+        class="w-full max-h-[500px] object-contain rounded-xl shadow"
+      />
+    </div>
+
+    <!-- Content -->
+    <div class="prose prose-lg max-w-none text-gray-700">
+      <%- singleNews.content %>
+    </div>
+  </article>
+
+  <!-- Comments Section -->
+  <section class="mt-12">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-6">Comments</h2>
+
+    <!-- Comment Form -->
+    <div class="bg-white shadow rounded-xl p-6 mb-8">
+      <form action="/single/<%= singleNews._id %>/comment" method="POST" class="space-y-4">
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Name</label>
+          <input type="text" name="name" required
+            class="mt-1 w-full border-gray-300 rounded-lg shadow-sm px-4 py-2 focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Email</label>
+          <input type="email" name="email" required
+            class="mt-1 w-full border-gray-300 rounded-lg shadow-sm px-4 py-2 focus:ring-indigo-500 focus:border-indigo-500">
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Comment</label>
+          <textarea name="content" rows="3" required
+            class="mt-1 w-full border-gray-300 rounded-lg shadow-sm px-4 py-2 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+        </div>
+        
+        <button type="submit" 
+          class="bg-indigo-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-indigo-700 transition">
+          Submit Comment
+        </button>
+      </form>
+    </div>
+
+    <!-- Display Comments -->
+    <div class="space-y-4">
+      <% if (comments.length === 0) { %>
+        <p class="text-gray-500">No comments yet. Be the first to share your thoughts!</p>
+      <% } else { %>
+        <% comments.forEach(comment => { %>
+          <div class="bg-white shadow rounded-xl p-4">
+            <h6 class="font-medium text-gray-800"><%= comment.name %></h6>
+            <p class="text-gray-700 mt-1"><%= comment.content %></p>
+            <small class="text-gray-500">
+              Posted on <%= comment.createdAt.toLocaleString("en-IN", { year: "numeric", day: "numeric", month: "short" }) %>
+            </small>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+  </section>
+</div>

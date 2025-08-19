@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReadSphere-Admin</title>
+  <link rel="icon" href="/images/news.jpg" type="image/jpg">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
+  <%- typeof tabulatorCSS === "undefined" ? '' : tabulatorCSS %>
+  <%- typeof summernoteCSS === "undefined" ? '' : summernoteCSS %>
+</head>
+<body class="bg-gray-100 font-sans">
+  <div class="flex h-screen">
+
+   
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white shadow-md">
+    <div class="flex flex-col items-center justify-center p-6 border-b">
+      <a href="/admin/dashboard">
+        <img src="/images/news.jpg" alt="Logo" class="h-12">
+      </a>
+      <h2 class="mt-2 text-xl font-bold text-gray-800">ReadSphere</h2>
+    </div>
+    <nav class="mt-6 space-y-1">
+      <a href="/admin/dashboard" class="nav-link flex items-center px-6 py-3 text-gray-700 hover:bg-gray-200">
+        <span class="material-icons">dashboard</span>
+        <span class="ml-3">Dashboard</span>
+      </a>
+      <a href="/admin/article" class="nav-link flex items-center px-6 py-3 text-gray-700 hover:bg-gray-200">
+        <span class="material-icons">article</span>
+        <span class="ml-3">Articles</span>
+      </a>
+      <% if (typeof role !== "undefined" && role === "admin"){ %>
+      <a href="/admin/category" class="nav-link flex items-center px-6 py-3 text-gray-700 hover:bg-gray-200">
+        <span class="material-icons">category</span>
+        <span class="ml-3">Categories</span>
+      </a>
+      <a href="/admin/users" class="nav-link flex items-center px-6 py-3 text-gray-700 hover:bg-gray-200">
+        <span class="material-icons">people</span>
+        <span class="ml-3">Users</span>
+      </a>
+      <% } %>
+      <a href="/admin/comments" class="nav-link flex items-center px-6 py-3 text-gray-700 hover:bg-gray-200">
+        <span class="material-icons">comment</span>
+        <span class="ml-3">Comments</span>
+      </a>
+      <% if (typeof role !== "undefined" && role === "admin"){ %>
+      <a href="/admin/settings" class="nav-link flex items-center px-6 py-3 text-gray-700 hover:bg-gray-200">
+        <span class="material-icons">settings</span>
+        <span class="ml-3">Settings</span>
+      </a>
+      <% } %>
+    </nav>
+  </aside>
+
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col">
+      <!-- Header -->
+      <header class="flex items-center justify-between p-6 bg-white border-b">
+        <h1 class="text-2xl font-semibold text-gray-800">Admin Panel</h1>
+        <div class="flex items-center space-x-4">
+          <span class="text-gray-700"><%= typeof username !== "undefined" ? username : "Admin" %></span>
+          <a href="/admin/logout" class="flex items-center text-red-600 hover:text-red-800">
+            <span class="material-icons">logout</span>
+            <span class="ml-2">Logout</span>
+          </a>
+        </div>
+      </header>
+
+      <!-- Dynamic Body -->
+      <div class="flex-1 p-6 overflow-y-auto">
+        <%- body %>
+      </div>
+
+      <!-- Footer -->
+      <footer class="bg-white border-t p-4 text-center text-sm text-gray-600">
+        © Copyright 2025 News | Powered by 
+        <a href="/" class="text-indigo-600 hover:underline">ReadSphere</a>
+      </footer>
+    </main>
+  </div>
+  <!-- Script for Active Link -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const links = document.querySelectorAll(".nav-link");
+    const currentPath = window.location.pathname;
+
+    links.forEach(link => {
+      if (link.getAttribute("href") === currentPath) {
+        link.classList.add("bg-gray-200", "text-indigo-600", "font-semibold");
+      }
+    });
+  });
+</script>
+</body>
+</html>

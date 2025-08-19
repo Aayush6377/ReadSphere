@@ -1,0 +1,234 @@
+<div id="admin-content" class="p-6">
+  <div class="max-w-7xl mx-auto">
+    <h1 class="text-2xl font-bold flex items-center gap-2 mb-4">
+      <i class="fa fa-comments text-blue-600"></i>
+      Comments Management
+    </h1>
+
+    <!-- Tailwind-styled card -->
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+      <div id="commentsTable"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Tabulator JS -->
+<script src="https://unpkg.com/tabulator-tables@6.3.1/dist/js/tabulator.min.js"></script>
+
+<script>
+  const tableData = <%- JSON.stringify(comments) %>;
+
+  if (tableData.errors) {
+    alert(`Error: ${tableData.errors}`);
+  } else {
+    const table = new Tabulator("#commentsTable", {
+      data: tableData,
+      layout: "fitColumns",
+      pagination: "local",
+      paginationSize: 10,
+      paginationSizeSelector: [5, 10, 25, 50, 100],
+      headerSort: true,
+      tooltips: true,
+      columns: [
+        { title: "S. No.", formatter: "rownum", width: 80, hozAlign: "center", headerHozAlign: "center" },
+        { title: "Article", field: "article.title", headerFilter: "input", headerFilterPlaceholder:"Search Article..." },
+        { title: "Content", field: "content", headerFilter: "input", headerFilterPlaceholder:"Search Content..." },
+        { title: "Name", field: "name", headerFilter: "input", headerFilterPlaceholder:"Search Name..." },
+        {
+          title: "Date",
+          field: "createdAt",
+          headerFilter: "input",
+          formatter: function (cell) {
+            var date = new Date(cell.getData().createdAt);
+            var options = { day: 'numeric', month: 'short', year: 'numeric' };
+            return date.toLocaleDateString('en-GB', options).replace(/ /g, '-');
+          }
+        },
+        {
+          title: "Status", field: "status", hozAlign: "center", formatter: function (cell) {
+            const status = cell.getValue();
+            const colors = {
+              pending: "bg-yellow-200 text-yellow-800",
+              approved: "bg-green-200 text-green-800",
+              rejected: "bg-red-200 text-red-800"
+            };
+            return `<span class="px-2 py-1 rounded text-xs font-medium ${colors[status] || "bg-gray-200 text-gray-800"}">${status}</span>`;
+          }
+        },
+        {
+          title: "Action", hozAlign: "center", formatter: function (cell) {
+            return `
+              <div class="flex gap-3 justify-center">
+                <a href="javascript:void(0)" onclick="viewComment('${cell.getData()._id}')" 
+                   title="View" 
+                   class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition">
+                  <i class="fa fa-eye"></i>
+                </a>
+                <button onclick="deleteComment('${cell.getData()._id}')" 
+                        title="Delete" 
+                        class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>`;
+          }
+        },
+      ],
+    });
+  }
+
+  // Delete Comment
+  async function deleteComment(id) {
+    try {
+      if (confirm("Are you sure you want to delete this comment?")) {
+        const response = await fetch(`/admin/delete-comment/${id}`, { method: "DELETE" });
+        if (response.ok) location.reload();
+        else {
+          const message = await response.json();
+          alert(`Error: ${message.message}`);
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  // View Comment in Tailwind Modal
+  async function viewComment(id) {
+    const comment = tableData.find(comment => comment._id === id);
+    if (!comment) {
+      alert("No comment found");
+      return;
+    }
+
+    const html = `
+      <p class="font-semibold">Message:</p>
+      <div class="p-3 border rounded bg-gray-50">${comment.content}</div>
+      <label class="mt-4 block font-semibold">Update Status:</label>
+      <select class="mt-2 border rounded w-full p-2"
+              onchange="updateCommentStatus('${comment._id}', this.value)">
+        <option value="pending" ${comment.status === "pending" ? "selected" : ""}>Pending</option>
+        <option value="approved" ${comment.status === "approved" ? "selected" : ""}>Approved</option>
+        <option value="rejected" ${comment.status === "rejected" ? "selected" : ""}>Rejected</option>
+      </select>
+    `;
+
+    document.getElementById("commentModalLabel").innerText = comment.name;
+    document.getElementById("commentModalBody").innerHTML = html;
+    document.getElementById("commentModal").classList.remove("hidden");
+  }
+
+  // Update Status
+  async function updateCommentStatus(id, status) {
+    try {
+      const response = await fetch(`/admin/update-comment-status/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      if (response.ok) location.reload();
+      else {
+        const message = await response.json();
+        alert(`Error: ${message.message}`);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  // Close Modal
+  function closeModal() {
+    document.getElementById("commentModal").classList.add("hidden");
+  }
+</script>
+
+<!-- Tailwind Modal -->
+<div id="commentModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white rounded-2xl shadow-lg w-full max-w-lg p-6">
+    <div class="flex justify-between items-center border-b pb-3">
+      <h5 class="text-lg font-bold" id="commentModalLabel">Comment Details</h5>
+      <button onclick="closeModal()" class="text-gray-600 hover:text-gray-900">&times;</button>
+    </div>
+    <div class="mt-4" id="commentModalBody"></div>
+    <div class="mt-6 flex justify-end gap-3 border-t pt-3">
+      <button onclick="closeModal()" class="px-4 py-2 bg-gray-200 rounded-lg">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Tabulator CSS -->
+<link href="https://unpkg.com/tabulator-tables@6.3.1/dist/css/tabulator_simple.min.css" rel="stylesheet">
+
+<style>
+  .tabulator {
+    border: none !important;
+  }
+  .tabulator .tabulator-header {
+    background-color: #f9fafb !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .tabulator .tabulator-col {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    text-transform: uppercase;
+  }
+  .tabulator .tabulator-header-filter input {
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.85rem;
+    width: 100%;
+    transition: all 0.2s;
+  }
+  .tabulator .tabulator-header-filter input:focus {
+    border-color: #2563eb;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3);
+  }
+  .tabulator .tabulator-row {
+    border-bottom: 1px solid #e5e7eb !important;
+    transition: background 0.2s;
+  }
+  .tabulator .tabulator-row:nth-child(even) {
+    background-color: #f9fafb;
+  }
+  .tabulator .tabulator-row:hover {
+    background-color: #eff6ff !important;
+  }
+  .tabulator .tabulator-cell {
+    font-size: 0.95rem;
+    color: #374151;
+    padding: 1rem 1.5rem;
+  }
+  .tabulator .tabulator-footer {
+    background-color: #fff !important;
+    border-top: 1px solid #e5e7eb !important;
+    padding: 0.75rem 1rem;
+  }
+  .tabulator .tabulator-page {
+    padding: 0.4rem 0.9rem;
+    margin: 0 0.25rem;
+    border: 1px solid #d1d5db;
+    border-radius: 9999px;
+    font-size: 0.85rem;
+    color: #4b5563;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tabulator .tabulator-page:hover {
+    background: #f3f4f6;
+  }
+  .tabulator .tabulator-page.active {
+    background: #2563eb;
+    color: #fff;
+    border-color: #1d4ed8;
+  }
+  .tabulator .tabulator-page:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+</style>

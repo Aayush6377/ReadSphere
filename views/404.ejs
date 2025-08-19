@@ -1,0 +1,25 @@
+<div class="flex items-center justify-center min-h-screen bg-gray-50 px-4">
+  <div class="bg-white rounded-2xl shadow-lg p-10 max-w-md w-full text-center animate-fadeIn">
+    <h1 class="text-3xl font-extrabold mb-4 <%= status === 'Success' ? 'text-green-600' : 'text-red-600' %>">
+      <%= status %>
+    </h1>
+    <p class="text-gray-700 text-lg">
+      <%= message %>
+    </p>
+    <button 
+      onclick="history.back()" 
+      class="inline-block mt-6 px-6 py-2 rounded-md bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition">
+      Go Back
+    </button>
+  </div>
+</div>
+
+<style>
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out;
+}
+</style>

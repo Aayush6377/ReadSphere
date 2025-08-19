@@ -1,0 +1,68 @@
+<div id="sidebar" class="space-y-10">
+
+  <!-- Search Box -->
+  <div class="bg-white shadow-md rounded-xl p-6">
+    <h4 class="text-lg font-semibold text-gray-800 mb-4">Search</h4>
+    <form class="flex" action="/search" method="GET">
+      <input 
+        type="text" 
+        name="search" 
+        placeholder="Search..." 
+        class="flex-grow border border-gray-300 rounded-l-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      />
+      <button 
+        type="submit" 
+        class="bg-indigo-600 text-white px-4 py-2 rounded-r-lg hover:bg-indigo-700"
+      >
+        <span class="material-icons">search</span>
+      </button>
+    </form>
+  </div>
+
+  <!-- Recent Posts -->
+  <div class="bg-white shadow-md rounded-xl p-6">
+    <% if (typeof latestNews === "undefined") latestNews = []; %>
+    <h4 class="text-lg font-semibold text-gray-800 mb-6">Recent Posts</h4>
+    
+    <div class="space-y-6">
+      <% latestNews.forEach(latest => { %>
+        <div class="flex space-x-4">
+          <!-- Thumbnail -->
+          <a href="/single/<%= latest._id %>" class="flex-shrink-0">
+            <div class="w-20 h-20 flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden">
+              <img 
+                src="/uploads/<%= latest.image %>" 
+                alt="<%= latest.title %>" 
+                class="max-w-full max-h-full object-contain"
+              />
+            </div>
+          </a>
+
+          <!-- Post Content -->
+          <div>
+            <h5 class="text-sm font-medium text-gray-800">
+              <a href="/single/<%= latest._id %>" class="hover:text-indigo-600">
+                <%= latest.title %>
+              </a>
+            </h5>
+            <div class="text-xs text-gray-500 space-x-2 mt-1">
+              <span>
+                <i class="fa fa-tags"></i>
+                <a href="/category/<%= latest.category.slug %>" class="hover:text-indigo-600">
+                  <%= latest.category.name %>
+                </a>
+              </span>
+              <span>
+                <i class="fa fa-calendar"></i>
+                <%= latest.createdAt.toLocaleString("en-IN", { year: "numeric", month: "short", day: "numeric" }) %>
+              </span>
+            </div>
+            <a href="/single/<%= latest._id %>" class="text-indigo-600 text-xs font-medium hover:underline mt-2 inline-block">
+              Read More →
+            </a>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</div>

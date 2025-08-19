@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ADMIN | Login</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+  <style type="text/tailwindcss">
+    :root {
+      --primary-color: #0d7ff2;
+      --background-color: #f9fafb;
+      --surface-color: #ffffff;
+      --text-primary: #111827;
+      --text-secondary: #6b7280;
+      --border-color: #e5e7eb;
+    }
+
+    body {
+      font-family: "Inter", sans-serif;
+      background-color: var(--background-color);
+    }
+
+    .login-card {
+      background-color: var(--surface-color);
+      border-radius: 1.5rem;
+      overflow: hidden;
+      animation: fadeIn 0.5s ease-out;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-input {
+      background-color: #f9fafb;
+      border-color: var(--border-color);
+      color: var(--text-primary);
+      transition: all 0.3s ease;
+    }
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(13, 127, 242, 0.2);
+      background-color: #fff;
+    }
+    .btn-primary {
+      background-color: var(--primary-color);
+      transition: background-color 0.3s ease;
+    }
+    .btn-primary:hover {
+      background-color: #0b68c9;
+    }
+
+    /* Background overlay */
+    .bg-overlay {
+      background-color: rgba(255,255,255,0.8);
+      backdrop-filter: blur(4px);
+    }
+  </style>
+</head>
+<body class="relative min-h-screen flex items-center justify-center">
+
+  <!-- Background Image -->
+  <div class="absolute inset-0">
+    <img src="https://c8.alamy.com/comp/HAK0C1/journal-pages-background-HAK0C1.jpg" 
+         alt="Background" 
+         class="w-full h-full object-cover">
+    <div class="absolute inset-0 bg-overlay"></div>
+  </div>
+
+  <!-- Login Card -->
+<div class="relative z-10 w-full max-w-md">
+  <div class="login-card">
+    <div class="p-8 sm:p-10">
+      <div class="text-center mb-8">
+        <!-- Logo Image -->
+        <img src="/images/news.jpg" alt="Admin Logo" class="mx-auto mb-4 h-16 w-auto">
+
+        <h2 class="text-3xl font-extrabold text-gray-900">Admin Login</h2>
+        <p class="mt-2 text-sm text-[var(--text-secondary)]">Sign in to manage the admin dashboard.</p>
+      </div>
+
+      <% if (typeof errList === "undefined") errList = {} %>
+      <% if (typeof old === "undefined") old = {} %>
+
+      <form action="/admin/index" method="POST" class="space-y-6">
+        <!-- Username -->
+        <div>
+          <label class="sr-only" for="username">Username</label>
+          <input 
+            type="text" 
+            name="username" 
+            id="username"
+            value="<%= (old?.username)? old.username : "" %>"
+            placeholder="Username"
+            required
+            class="form-input block w-full rounded-md border p-4 text-sm <%= (errList?.username)? 'border-red-500' : '' %>"
+          />
+          <% if (errList?.username){ %>
+            <p class="mt-2 text-sm text-red-600"><%= errList.username %></p>
+          <% } %>
+        </div>
+
+        <!-- Password -->
+        <div>
+          <label class="sr-only" for="password">Password</label>
+          <input 
+            type="password" 
+            name="password" 
+            id="password"
+            value="<%= (old?.password)? old.password : "" %>"
+            placeholder="Password"
+            required
+            class="form-input block w-full rounded-md border p-4 text-sm <%= (errList?.password)? 'border-red-500' : '' %>"
+          />
+          <% if (errList?.password){ %>
+            <p class="mt-2 text-sm text-red-600"><%= errList.password %></p>
+          <% } %>
+        </div>
+
+        <!-- Submit -->
+        <div>
+          <button type="submit" class="btn-primary w-full rounded-md py-3 px-4 text-sm font-semibold text-white">Login</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+</body>
+</html>
