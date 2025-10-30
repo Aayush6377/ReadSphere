@@ -5,14 +5,14 @@
 ![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)
 ![EJS](https://img.shields.io/badge/EJS-FFD700?style=for-the-badge&logo=ejs&logoColor=black)
 ![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)
-![Render](https://img.shields.io/badge/Render-000000?style=for-the-badge&logo=render&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
 
 
 ReadSphere is a full-featured **Content Management System (CMS)** where users can read articles across multiple categories. It provides role-based access with **Admin** and **Author** logins. Admins can manage the platform, users, articles, and categories, while Authors can focus on writing and moderating their own content.  
 
 🔗 **Live Demo:**  
-- 🌍 Main Site: [ReadSphere Demo](https://readsphere-i5uc.onrender.com)  
-- 🛠️ Admin Panel: [ReadSphere Admin Panel](https://readsphere-i5uc.onrender.com/admin)  
+- 🌍 Main Site: [ReadSphere Demo](https://read-sphere-tan.vercel.app)  
+- 🛠️ Admin Panel: [ReadSphere Admin Panel](https://read-sphere-tan.vercel.app/admin)  
 
 ---
 
@@ -45,7 +45,7 @@ ReadSphere is a full-featured **Content Management System (CMS)** where users ca
 - **File Uploads:** Cloudinary  
 - **Session & Auth:** express-session, JWT, bcryptjs  
 - **UI Tools:** Tabulator (tables), Summernote (editor)  
-- **Hosting:** Render (Backend + EJS), MongoDB Atlas (Database), Cloudinary (Image storage)  
+- **Hosting:** Versel (Backend + EJS), MongoDB Atlas (Database), Cloudinary (Image storage)  
 
 ---
 
